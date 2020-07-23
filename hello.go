@@ -1,23 +1,21 @@
 package main
 
-import ("fmt"
-	"os"
+import (
 	"bufio"
+	"fmt"
+	"os"
 	"strings"
-
 )
 
-
 type choices struct {
-	cmd string
+	cmd         string
 	description string
-	nextNode *storyNode
-	nextChoice *choices 
+	nextNode    *storyNode
+	nextChoice  *choices
 }
 
 type storyNode struct {
-
-	text string
+	text    string
 	choices *choices
 }
 
@@ -26,21 +24,18 @@ func (node *storyNode) addChoice(cmd string, description string, nextNode *story
 	if node.choices == nil {
 		node.choices = choice
 	} else {
-			currentChoice := node.choices 
-			for currentChoice.nextChoice != nil {
-				currentChoice = currentChoice.nextChoice
-			}
-			currentChoice.nextChoice = choice
+		currentChoice := node.choices
+		for currentChoice.nextChoice != nil {
+			currentChoice = currentChoice.nextChoice
 		}
+		currentChoice.nextChoice = choice
+	}
 }
-
-
-
 
 func (node *storyNode) render() {
 
 	fmt.Println(node.text)
-	currentChoice := node.choices 
+	currentChoice := node.choices
 	for currentChoice != nil {
 		fmt.Println(currentChoice.cmd, ":", currentChoice.description)
 		currentChoice = currentChoice.nextChoice
@@ -54,11 +49,10 @@ func (node *storyNode) executeCmd(cmd string) *storyNode {
 			return currentChoice.nextNode
 		}
 		currentChoice = currentChoice.nextChoice
-	} 
+	}
 	fmt.Println("Sorry, nix verstehen")
 	return node
 }
-
 
 var scanner *bufio.Scanner
 
@@ -71,8 +65,6 @@ func (node *storyNode) play() {
 	}
 }
 
-
-
 func main() {
 	scanner = bufio.NewScanner(os.Stdin)
 
@@ -82,8 +74,8 @@ func main() {
 	`}
 
 	darkRoom := storyNode{text: "Ohhh fuckkk. Du merkst, es ist hier mega Dunkel. Kannst nix sehen, scheiß Laterne"}
-	
-	darkRoomLit := storyNode{text: "Schmeckt, du kannst wieder Umgebung erblicken. Jetzt aber 1 entscheidende Frage, willst du dein Herz folgen und weiter gehen, oder bist am zweifeln und gehst Süden?"}
+
+	darkRoomLit := storyNode{text: "Schmeckt, du kannst wieder Umgebung erblicken. Jetzt aber 1 entscheidende Frage, willst du dein Herz folgen und weiter gehen, oder gehst du zurück und kämpfst?"}
 
 	grue := storyNode{text: "Ein sogenannter Stein war dir im Weg, du stolperst."}
 
@@ -91,16 +83,18 @@ func main() {
 
 	treasure := storyNode{text: "1 Polizist trifft ein. Du sagst: 'Hilfe Herr Officer, 1 Räuber ist hinter mir.'"}
 
+	kampf := storyNode{text: "Räuber gibt Rechte, du weichst aus, machst Roundhouse-Kick - erfolglos. Plötzlich macht Räuber einen Salto, um dich zu verwirren, macht Kapoera und knockt dich aus."}
+
 	start.addChoice("N", "Richtung Norden", &darkRoom)
 	start.addChoice("S", "Richtung Süden", &darkRoom)
 	start.addChoice("O", "Richtung Osten", &trap)
 
-	darkRoom.addChoice("S","Einfach weitergehen gen Süden", &grue)
-	darkRoom.addChoice("T","Die Taschenlampe die du immer bei dir hast einschalten", &darkRoomLit)
+	darkRoom.addChoice("S", "Einfach weitergehen gen Süden", &grue)
+	darkRoom.addChoice("T", "Die Taschenlampe die du immer bei dir hast einschalten", &darkRoomLit)
 
-	darkRoomLit.addChoice("N", "Richtung Norden", &treasure)
-	darkRoomLit.addChoice("S", "Richtung Süden", &start)
-	
+	darkRoomLit.addChoice("W", "Weiter gehen", &treasure)
+	darkRoomLit.addChoice("K", "Kämpfen", &kampf)
+
 	start.play()
 
 	fmt.Println()
